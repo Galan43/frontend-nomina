@@ -1,0 +1,162 @@
+<div class="row">
+  <div class="col-12">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h2>Gestión de Usuarios</h2>
+      <button class="btn btn-primary" (click)="showModal = true; resetForm()"
+              *ngIf="(permissionsService.isAdmin() || permissionsService.isManager()) && !showDeleted">
+        <i class="fas fa-plus me-2"></i>Nuevo Usuario
+      </button>
+      <button class="btn me-2" 
+              [class]="showDeleted ? 'btn-warning' : 'btn-outline-warning'"
+              (click)="toggleShowDeleted()"
+              *ngIf="permissionsService.isAdmin()">
+        <i class="fas fa-trash-restore me-2"></i>
+        {{ showDeleted ? 'Ver Activos' : 'Ver Eliminados' }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Filtros -->
+<div class="row mb-4">
+  <div class="col-md-4">
+    <input type="text" class="form-control" placeholder="Buscar usuario..." 
+           [(ngModel)]="searchTerm" (input)="filterUsuarios()">
+  </div>
+  <div class="col-md-3">
+    <select class="form-select" [(ngModel)]="filterRole" (change)="filterUsuarios()">
+      <option value="">Todos los roles</option>
+      <option value="ADMIN">Administrador</option>
+      <option value="MANAGER">Manager</option>
+      <option value="EMPLOYEE">Empleado</option>
+    </select>
+  </div>
+</div>
+
+<!-- Tabla de Usuarios -->
+<div class="card">
+  <div class="card-body">
+    <div class="table-responsive">
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Email</th>
+            <th>Rol</th>
+            <th>Región</th>
+            <th>Fecha Creación</th>
+            <th *ngIf="showDeleted">Fecha Eliminación</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let usuario of filteredUsuarios"
+              [class]="usuario.eliminadoEn ? 'table-secondary' : ''">
+            <td>{{ usuario.nombre }}</td>
+            <td>{{ usuario.email }}</td>
+            <td>
+              <span class="badge" [class]="getRoleBadgeClass(usuario.rol)">
+                {{ usuario.rol }}
+              </span>
+            </td>
+            <td>{{ usuario.region }}</td>
+            <td>{{ usuario.createdAt ? (toDate(usuario.createdAt) | date:'shortDate') : 'Sin fecha' }}</td>
+            <td *ngIf="showDeleted">
+              {{ usuario.eliminadoEn ? (toDate(usuario.eliminadoEn) | date:'shortDate') : 'N/A' }}
+            </td>
+            <td>
+              <!-- Botones para usuarios activos -->
+              <div *ngIf="!usuario.eliminadoEn">
+                <button class="btn btn-sm btn-outline-primary me-1" 
+                        (click)="editUser(usuario)"
+                        *ngIf="canEditUser(usuario)">
+                  <i class="fas fa-edit"></i>
+                </button>
+                <button class="btn btn-sm btn-outline-danger" 
+                        (click)="deleteUser(usuario.id)"
+                        *ngIf="canDeleteUser(usuario)">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </div>
+              
+              <!-- Botón para restaurar usuarios eliminados -->
+              <div *ngIf="usuario.eliminadoEn">
+                <button class="btn btn-sm btn-success" 
+                        (click)="restoreUser(usuario.id)"
+                        *ngIf="permissionsService.isAdmin()">
+                  <i class="fas fa-undo me-1"></i>Restaurar
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal" [class.show]="showModal" [style.display]="showModal ? 'block' : 'none'">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">{{ isEditing ? 'Editar' : 'Nuevo' }} Usuario</h5>
+        <button type="button" class="btn-close" (click)="showModal = false"></button>
+      </div>
+      <div class="modal-body">
+        <form (ngSubmit)="saveUser()" #userForm="ngForm">
+          <div class="mb-3">
+            <label class="form-label">Nombre *</label>
+            <input type="text" class="form-control" 
+                   [(ngModel)]="currentUser.nombre" 
+                   name="nombre" required>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Email *</label>
+            <input type="email" class="form-control" 
+                   [(ngModel)]="currentUser.email" 
+                   name="email" required
+                   [disabled]="isEditing">
+          </div>
+
+          <div class="mb-3" *ngIf="!isEditing">
+            <label class="form-label">Contraseña *</label>
+            <input type="password" class="form-control" 
+                   [(ngModel)]="userPassword" 
+                   name="password" required>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Rol *</label>
+            <select class="form-select" 
+                    [(ngModel)]="currentUser.rol" 
+                    name="rol" required>
+              <option *ngFor="let role of getAvailableRoles()" [value]="role">
+                {{ role === 'EMPLOYEE' ? 'Empleado' : (role === 'MANAGER' ? 'Manager' : 'Administrador') }}
+              </option>
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Región *</label>
+            <input type="text" class="form-control" 
+                   [(ngModel)]="currentUser.region" 
+                   name="region" required>
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" (click)="showModal = false">
+              Cancelar
+            </button>
+            <button type="submit" class="btn btn-primary" [disabled]="userForm.invalid || loading">
+              <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
+              {{ isEditing ? 'Actualizar' : 'Crear' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal-backdrop" *ngIf="showModal"></div>

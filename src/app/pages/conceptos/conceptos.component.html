@@ -1,0 +1,126 @@
+<div class="row">
+  <div class="col-12">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h2>Conceptos de Nómina</h2>
+      <button class="btn btn-primary" (click)="showModal = true; resetForm()">
+        <i class="fas fa-plus me-2"></i>Nuevo Concepto
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Filtros -->
+<div class="row mb-4">
+  <div class="col-md-3">
+    <select class="form-select" [(ngModel)]="filterTipo" (change)="filterConceptos()">
+      <option value="">Todos los tipos</option>
+      <option value="PERCEPCION">Percepciones</option>
+      <option value="DEDUCCION">Deducciones</option>
+    </select>
+  </div>
+</div>
+
+<!-- Tabla de Conceptos -->
+<div class="card">
+  <div class="card-body">
+    <div class="table-responsive">
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Tipo</th>
+            <th>Importe</th>
+            <th>Descripción</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let concepto of filteredConceptos">
+            <td>{{ concepto.nombre }}</td>
+            <td>
+              <span class="badge" [class]="concepto.tipo === 'PERCEPCION' ? 'bg-success' : 'bg-warning'">
+                {{ concepto.tipo }}
+              </span>
+            </td>
+            <td>${{ concepto.importe | number:'1.2-2' }}</td>
+            <td>{{ concepto.descripcion || 'N/A' }}</td>
+            <td>
+              <span class="badge" [class]="concepto.activo ? 'bg-success' : 'bg-danger'">
+                {{ concepto.activo ? 'Activo' : 'Inactivo' }}
+              </span>
+            </td>
+            <td>
+              <button class="btn btn-sm btn-outline-primary me-1" 
+                      (click)="editConcepto(concepto)">
+                <i class="fas fa-edit"></i>
+              </button>
+              <button class="btn btn-sm btn-outline-danger" 
+                      (click)="deleteConcepto(concepto.id)">
+                <i class="fas fa-trash"></i>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal" [class.show]="showModal" [style.display]="showModal ? 'block' : 'none'">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">{{ isEditing ? 'Editar' : 'Nuevo' }} Concepto</h5>
+        <button type="button" class="btn-close" (click)="showModal = false"></button>
+      </div>
+      <div class="modal-body">
+        <form (ngSubmit)="saveConcepto()" #conceptoForm="ngForm">
+          <div class="mb-3">
+            <label class="form-label">Nombre *</label>
+            <input type="text" class="form-control" 
+                   [(ngModel)]="currentConcepto.nombre" 
+                   name="nombre" required>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Tipo *</label>
+            <select class="form-select" 
+                    [(ngModel)]="currentConcepto.tipo" 
+                    name="tipo" required>
+              <option value="">Seleccionar tipo</option>
+              <option value="PERCEPCION">Percepción</option>
+              <option value="DEDUCCION">Deducción</option>
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Importe *</label>
+            <input type="number" class="form-control" step="0.01"
+                   [(ngModel)]="currentConcepto.importe" 
+                   name="importe" required>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Descripción (opcional)</label>
+            <textarea class="form-control" rows="2"
+                      [(ngModel)]="currentConcepto.descripcion" 
+                      name="descripcion"></textarea>
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" (click)="showModal = false">
+              Cancelar
+            </button>
+            <button type="submit" class="btn btn-primary" [disabled]="conceptoForm.invalid || loading">
+              <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
+              {{ isEditing ? 'Actualizar' : 'Crear' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal-backdrop" *ngIf="showModal"></div>

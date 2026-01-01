@@ -1,0 +1,25 @@
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.cursor-pointer:hover {
+  background-color: #f8f9fa !important;
+}
+
+.border-bottom:last-child {
+  border-bottom: none !important;
+}
+
+.input-group-text {
+  background-color: #e9ecef;
+  border-color: #ced4da;
+}
+
+.card-header {
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.bg-light {
+  background-color: #f8f9fa !important;
+}

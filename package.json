@@ -17,8 +17,16 @@
     "@angular/platform-browser": "^19.2.0",
     "@angular/platform-browser-dynamic": "^19.2.0",
     "@angular/router": "^19.2.0",
+    "@ngrx/effects": "^21.0.1",
+    "@ngrx/store": "^21.0.1",
+    "@ngrx/store-devtools": "^21.0.1",
+    "bootstrap": "^5.3.8",
+    "firebase": "^12.7.0",
+    "jspdf": "^3.0.4",
+    "jspdf-autotable": "^5.0.2",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
+    "xlsx": "^0.18.5",
     "zone.js": "~0.15.0"
   },
   "devDependencies": {

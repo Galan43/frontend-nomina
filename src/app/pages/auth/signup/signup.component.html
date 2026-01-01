@@ -1,0 +1,96 @@
+<div class="container-fluid vh-100">
+  <div class="row h-100">
+    <div class="col-md-6 d-flex align-items-center justify-content-center bg-success">
+      <div class="text-white text-center">
+        <h1 class="display-4 fw-bold">Únete al Sistema</h1>
+        <p class="lead">Crea tu cuenta de administrador</p>
+      </div>
+    </div>
+    <div class="col-md-6 d-flex align-items-center justify-content-center">
+      <div class="card shadow-lg" style="width: 450px;">
+        <div class="card-body p-5">
+          <h3 class="card-title text-center mb-4">Crear Cuenta</h3>
+          
+          <div *ngIf="error" class="alert alert-danger" role="alert">
+            {{ error }}
+          </div>
+
+          <div *ngIf="success" class="alert alert-success" role="alert">
+            {{ success }}
+          </div>
+
+          <form (ngSubmit)="onSubmit()" #signupForm="ngForm">
+            <div class="mb-3">
+              <label for="username" class="form-label">Usuario</label>
+              <input 
+                type="text" 
+                class="form-control" 
+                id="username"
+                name="username"
+                [(ngModel)]="userData.nombre"
+                required
+                #username="ngModel">
+            </div>
+
+            <div class="mb-3">
+              <label for="email" class="form-label">Correo Electrónico</label>
+              <input 
+                type="email" 
+                class="form-control" 
+                id="email"
+                name="email"
+                [(ngModel)]="userData.email"
+                required
+                #email="ngModel">
+            </div>
+
+            <div class="mb-3">
+              <label for="password" class="form-label">Contraseña</label>
+              <input 
+                type="password" 
+                class="form-control" 
+                id="password"
+                name="password"
+                [(ngModel)]="userData.password"
+                required
+                minlength="6"
+                #password="ngModel">
+            </div>
+
+            <div class="mb-3">
+              <label for="region" class="form-label">Región</label>
+              <select 
+                class="form-select" 
+                id="region"
+                name="region"
+                [(ngModel)]="userData.region"
+                required
+                #region="ngModel">
+                <option value="">Seleccionar región</option>
+                <option value="NORTE">Norte</option>
+                <option value="SUR">Sur</option>
+                <option value="CENTRO">Centro</option>
+                <option value="ESTE">Este</option>
+                <option value="OESTE">Oeste</option>
+              </select>
+            </div>
+
+            <button 
+              type="submit" 
+              class="btn btn-success w-100 mb-3"
+              [disabled]="signupForm.invalid || loading">
+              <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
+              {{ loading ? 'Creando...' : 'Crear Cuenta' }}
+            </button>
+          </form>
+
+          <div class="text-center">
+            <p class="mb-0">¿Ya tienes cuenta? 
+              <a href="/login" class="text-decoration-none">Inicia sesión</a>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

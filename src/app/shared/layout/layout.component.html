@@ -1,0 +1,83 @@
+<div class="d-flex">
+  <!-- Sidebar -->
+  <nav class="sidebar bg-dark text-white" style="width: 250px; position: fixed; height: 100vh; z-index: 1000;">
+    <div class="p-3">
+      <h4 class="text-center mb-4">Sistema Nómina</h4>
+      
+      <div class="mb-4 text-center">
+        <div class="bg-primary rounded-circle d-inline-flex align-items-center justify-content-center" 
+             style="width: 50px; height: 50px;">
+          <i class="fas fa-user text-white"></i>
+        </div>
+        <div class="mt-2">
+          <small class="text-muted">{{ currentUser?.nombre }}</small><br>
+          <small class="text-muted">{{ currentUser?.region }}</small>
+        </div>
+      </div>
+
+      <ul class="nav flex-column">
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/dashboard" routerLinkActive="active">
+            <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/empleados" routerLinkActive="active">
+            <i class="fas fa-users me-2"></i>Empleados
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/puestos" routerLinkActive="active">
+            <i class="fas fa-briefcase me-2"></i>Puestos
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/conceptos" routerLinkActive="active">
+            <i class="fas fa-calculator me-2"></i>Conceptos
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/nomina" routerLinkActive="active">
+            <i class="fas fa-money-bill-wave me-2"></i>Nómina
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/reportes" routerLinkActive="active">
+            <i class="fas fa-chart-bar me-2"></i>Reportes
+          </a>
+        </li>
+      </ul>
+    </div>
+
+    <div class="mt-auto p-3">
+      <div class="text-center mb-2">
+        <small class="text-muted d-block">{{ currentUser?.nombre }}</small>
+        <small class="text-muted">{{ currentUser?.region }}</small>
+      </div>
+      <button class="btn btn-outline-light w-100" (click)="logout()">
+        <i class="fas fa-sign-out-alt me-2"></i>Cerrar Sesión
+      </button>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <div class="main-content flex-grow-1" style="margin-left: 250px;">
+    <!-- Top Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom">
+      <div class="container-fluid">
+        <button class="btn btn-outline-secondary d-md-none" type="button">
+          <i class="fas fa-bars"></i>
+        </button>
+        
+        <div class="ms-auto">
+          <span class="text-muted">Sistema de Nómina</span>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Page Content -->
+    <div class="container-fluid p-4">
+      <router-outlet></router-outlet>
+    </div>
+  </div>
+</div>

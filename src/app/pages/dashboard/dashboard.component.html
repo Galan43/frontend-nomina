@@ -1,0 +1,112 @@
+<div class="row">
+  <div class="col-12">
+    <h2 class="mb-4">Dashboard</h2>
+  </div>
+</div>
+
+<!-- Estadísticas -->
+<div class="row mb-4">
+  <div class="col-md-3">
+    <div class="card bg-primary text-white">
+      <div class="card-body">
+        <div class="d-flex justify-content-between">
+          <div>
+            <h4>{{ totalEmpleados }}</h4>
+            <p class="mb-0">Total Empleados</p>
+          </div>
+          <div class="align-self-center">
+            <i class="fas fa-users fa-2x"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-3">
+    <div class="card bg-success text-white">
+      <div class="card-body">
+        <div class="d-flex justify-content-between">
+          <div>
+            <h4>{{ empleadosActivos }}</h4>
+            <p class="mb-0">Empleados Activos</p>
+          </div>
+          <div class="align-self-center">
+            <i class="fas fa-user-check fa-2x"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-3">
+    <div class="card bg-info text-white">
+      <div class="card-body">
+        <div class="d-flex justify-content-between">
+          <div>
+            <h4>{{ totalPuestos }}</h4>
+            <p class="mb-0">Puestos</p>
+          </div>
+          <div class="align-self-center">
+            <i class="fas fa-briefcase fa-2x"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-3">
+    <div class="card bg-warning text-white">
+      <div class="card-body">
+        <div class="d-flex justify-content-between">
+          <div>
+            <h4>${{ totalNomina | number:'1.2-2' }}</h4>
+            <p class="mb-0">Nómina Total</p>
+          </div>
+          <div class="align-self-center">
+            <i class="fas fa-dollar-sign fa-2x"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Empleados por Puesto -->
+<div class="row">
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-header">
+        <h5 class="mb-0">Empleados por Puesto</h5>
+      </div>
+      <div class="card-body">
+        <div *ngIf="empleadosPorPuesto.length === 0" class="text-center text-muted">
+          No hay datos disponibles
+        </div>
+        <div *ngFor="let item of empleadosPorPuesto" class="d-flex justify-content-between align-items-center mb-2">
+          <span>{{ item.puesto }}</span>
+          <span class="badge bg-primary">{{ item.cantidad }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-header">
+        <h5 class="mb-0">Empleados Recientes</h5>
+      </div>
+      <div class="card-body">
+        <div *ngIf="empleadosRecientes.length === 0" class="text-center text-muted">
+          No hay empleados recientes
+        </div>
+        <div *ngFor="let empleado of empleadosRecientes" class="d-flex justify-content-between align-items-center mb-2">
+          <div>
+            <strong>{{ empleado.nombre }}</strong><br>
+            <small class="text-muted">{{ empleado.puesto }}</small>
+          </div>
+          <small class="text-muted">{{ toDate(empleado.creadoEn) | date:'shortDate' }}</small>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

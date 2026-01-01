@@ -1,0 +1,221 @@
+<div class="row">
+  <div class="col-12">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h2>Gestión de Empleados</h2>
+      <div>
+        <button class="btn btn-outline-secondary me-2" (click)="loadEmpleados()">
+          <i class="fas fa-sync-alt me-2"></i>Actualizar
+        </button>
+        <button class="btn me-2" 
+                [class]="showDeleted ? 'btn-warning' : 'btn-outline-warning'"
+                (click)="toggleShowDeleted()"
+                *ngIf="permissionsService.isAdmin()">
+          <i class="fas fa-trash-restore me-2"></i>
+          {{ showDeleted ? 'Ver Activos' : 'Ver Eliminados' }}
+        </button>
+        <button class="btn btn-warning me-2" (click)="fixEmpleadosSinFecha()"
+                *ngIf="permissionsService.hasPermission(Permission.EDIT_EMPLOYEE) && !showDeleted">
+          <i class="fas fa-wrench me-2"></i>Arreglar Fechas
+        </button>
+        <button class="btn btn-primary" (click)="showModal = true; resetForm()"
+                *ngIf="permissionsService.hasPermission(Permission.CREATE_EMPLOYEE) && !showDeleted">
+          <i class="fas fa-plus me-2"></i>Nuevo Empleado
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Filtros -->
+<div class="row mb-4">
+  <div class="col-md-4">
+    <input type="text" class="form-control" placeholder="Buscar empleado..." 
+           [(ngModel)]="searchTerm" (input)="filterEmpleados()">
+  </div>
+  <div class="col-md-3">
+    <select class="form-select" [(ngModel)]="filterStatus" (change)="filterEmpleados()">
+      <option value="">Todos los estados</option>
+      <option value="true">Activos</option>
+      <option value="false">Inactivos</option>
+    </select>
+  </div>
+</div>
+
+<!-- Tabla de Empleados -->
+<div class="card">
+  <div class="card-body">
+    <div class="table-responsive">
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Email</th>
+            <th>Puesto</th>
+            <th *ngIf="!permissionsService.isEmployee()">Rol</th>
+            <th>Región</th>
+            <th>Fecha Creación</th>
+            <th *ngIf="showDeleted">Fecha Eliminación</th>
+            <th>Estado</th>
+            <th *ngIf="!permissionsService.isEmployee()">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let empleado of filteredEmpleados" 
+              [class]="empleado.eliminadoEn ? 'table-secondary' : ''">
+            <td>{{ empleado.nombre }}</td>
+            <td>{{ empleado.email || 'Sin email' }}</td>
+            <td>{{ empleado.puesto || 'Sin asignar' }}</td>
+            <td *ngIf="!permissionsService.isEmployee()">
+              <span class="badge" *ngIf="empleado.rol" 
+                    [class]="empleado.rol === 'ADMIN' ? 'bg-danger' : (empleado.rol === 'MANAGER' ? 'bg-warning' : 'bg-info')">
+                {{ empleado.rol }}
+              </span>
+              <span *ngIf="!empleado.rol" class="text-muted">Sin rol</span>
+            </td>
+            <td>{{ empleado.region }}</td>
+            <td>{{ empleado.creadoEn ? (toDate(empleado.creadoEn) | date:'shortDate') : 'Sin fecha' }}</td>
+            <td *ngIf="showDeleted">
+              {{ empleado.eliminadoEn ? (toDate(empleado.eliminadoEn) | date:'shortDate') : 'N/A' }}
+            </td>
+            <td>
+              <span class="badge" 
+                    [class]="empleado.eliminadoEn ? 'bg-secondary' : (empleado.activo ? 'bg-success' : 'bg-danger')">
+                {{ empleado.eliminadoEn ? 'Eliminado' : (empleado.activo ? 'Activo' : 'Inactivo') }}
+              </span>
+              <button class="btn btn-sm mt-1 ms-2" 
+                      [class]="empleado.activo ? 'btn-outline-warning' : 'btn-outline-success'"
+                      (click)="toggleEmpleadoStatus(empleado)"
+                      *ngIf="permissionsService.hasPermission(Permission.EDIT_EMPLOYEE) && !empleado.eliminadoEn">
+                <i class="fas" [class]="empleado.activo ? 'fa-pause' : 'fa-play'"></i>
+                {{ empleado.activo ? 'Desactivar' : 'Activar' }}
+              </button>
+            </td>
+            <!-- Botones para empleados activos -->
+            <td *ngIf="!permissionsService.isEmployee()">
+              <div *ngIf="!empleado.eliminadoEn">
+                <button class="btn btn-sm btn-outline-primary me-1" 
+                        (click)="editEmpleado(empleado)"
+                        *ngIf="permissionsService.hasPermission(Permission.EDIT_EMPLOYEE)">
+                  <i class="fas fa-edit"></i>
+                </button>
+                <button class="btn btn-sm btn-outline-danger me-1" 
+                        (click)="deleteEmpleado(empleado.id, true)"
+                        *ngIf="permissionsService.hasPermission(Permission.DELETE_EMPLOYEE)">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </div>
+              
+              <!-- Botón para restaurar empleados eliminados -->
+              <div *ngIf="empleado.eliminadoEn">
+                <button class="btn btn-sm btn-success me-1" 
+                        (click)="restoreEmpleado(empleado.id)"
+                        *ngIf="permissionsService.isAdmin()">
+                  <i class="fas fa-undo me-1"></i>Restaurar
+                </button>
+                <button class="btn btn-sm btn-outline-dark" 
+                        (click)="deleteEmpleadoPermanente(empleado.id)"
+                        *ngIf="permissionsService.isAdmin()"
+                        title="Eliminar permanentemente">
+                  <i class="fas fa-times"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal" [class.show]="showModal" [style.display]="showModal ? 'block' : 'none'">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">{{ isEditing ? 'Editar' : 'Nuevo' }} Empleado</h5>
+        <button type="button" class="btn-close" (click)="showModal = false"></button>
+      </div>
+      <div class="modal-body">
+        <form (ngSubmit)="saveEmpleado()" #empleadoForm="ngForm">
+          <div class="row">
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label class="form-label">Nombre *</label>
+                <input type="text" class="form-control" 
+                       [(ngModel)]="currentEmpleado.nombre" 
+                       name="nombre" required>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label class="form-label">Email</label>
+                <input type="email" class="form-control" 
+                       [(ngModel)]="currentEmpleado.email" 
+                       name="email">
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label class="form-label">Región *</label>
+                <input type="text" class="form-control" 
+                       [(ngModel)]="currentEmpleado.region" 
+                       name="region" required>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label class="form-label">Rol</label>
+                <select class="form-select" 
+                        [(ngModel)]="currentEmpleado.rol" 
+                        name="rol">
+                  <option value="">Sin rol de sistema</option>
+                  <option value="EMPLOYEE">Empleado</option>
+                  <option value="MANAGER">Manager</option>
+                  <option value="ADMIN">Administrador</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label class="form-label">Puesto *</label>
+                <input type="text" class="form-control" 
+                       [(ngModel)]="currentEmpleado.puesto" 
+                       name="puesto" 
+                       placeholder="Ej: Desarrollador, Analista, Gerente..."
+                       required>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label class="form-label">Estado</label>
+                <select class="form-select" 
+                        [(ngModel)]="currentEmpleado.activo" 
+                        name="activo">
+                  <option [value]="true">Activo</option>
+                  <option [value]="false">Inactivo</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" (click)="showModal = false">
+              Cancelar
+            </button>
+            <button type="submit" class="btn btn-primary" [disabled]="empleadoForm.invalid || loading">
+              <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
+              {{ isEditing ? 'Actualizar' : 'Crear' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal-backdrop" *ngIf="showModal"></div>

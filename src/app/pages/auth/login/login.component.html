@@ -1,0 +1,70 @@
+<div class="container-fluid vh-100">
+  <div class="row h-100">
+    <div class="col-md-6 d-flex align-items-center justify-content-center bg-primary">
+      <div class="text-white text-center">
+        <h1 class="display-4 fw-bold">Sistema de Nómina</h1>
+        <p class="lead">Gestión integral de empleados y nóminas</p>
+      </div>
+    </div>
+    <div class="col-md-6 d-flex align-items-center justify-content-center">
+      <div class="card shadow-lg" style="width: 400px;">
+        <div class="card-body p-5">
+          <h3 class="card-title text-center mb-4">Iniciar Sesión</h3>
+          
+          <div *ngIf="error" class="alert alert-danger" role="alert">
+            {{ error }}
+          </div>
+
+          <form (ngSubmit)="onSubmit()" #loginForm="ngForm">
+            <div class="mb-3">
+              <label for="email" class="form-label">Email</label>
+              <input 
+                type="email" 
+                class="form-control" 
+                id="email"
+                name="email"
+                [(ngModel)]="credentials.email"
+                required
+                email
+                #email="ngModel"
+                placeholder="ejemplo@correo.com">
+              <div *ngIf="email.invalid && email.touched" class="text-danger">
+                <div *ngIf="email.errors?.['required']">El email es requerido</div>
+                <div *ngIf="email.errors?.['email']">Ingresa un email válido</div>
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label for="password" class="form-label">Contraseña</label>
+              <input 
+                type="password" 
+                class="form-control" 
+                id="password"
+                name="password"
+                [(ngModel)]="credentials.password"
+                required
+                #password="ngModel">
+              <div *ngIf="password.invalid && password.touched" class="text-danger">
+                La contraseña es requerida
+              </div>
+            </div>
+
+            <button 
+              type="submit" 
+              class="btn btn-primary w-100 mb-3"
+              [disabled]="loginForm.invalid || loading">
+              <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
+              {{ loading ? 'Iniciando...' : 'Iniciar Sesión' }}
+            </button>
+          </form>
+
+          <div class="text-center">
+            <p class="mb-0">¿No tienes cuenta? 
+              <a href="/signup" class="text-decoration-none">Regístrate</a>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
