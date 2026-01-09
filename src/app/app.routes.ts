@@ -10,6 +10,7 @@ import { ConceptosComponent } from './pages/conceptos/conceptos.component';
 import { NominaComponent } from './pages/nomina/nomina.component';
 import { ReportesComponent } from './pages/reportes/reportes.component';
 import { UsuariosComponent } from './pages/usuarios/usuarios.component';
+import { GraficaComponent } from './pages/grafica/grafica.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
@@ -25,7 +26,8 @@ export const routes: Routes = [
       { path: 'puestos', component: PuestosComponent },
       { path: 'conceptos', component: ConceptosComponent },
       { path: 'nomina', component: NominaComponent },
-      { path: 'reportes', component: ReportesComponent }
+      { path: 'reportes', component: ReportesComponent },
+      { path: 'graficas', component: GraficaComponent }
     ]
   }
 ];
